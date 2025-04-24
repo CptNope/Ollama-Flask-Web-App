@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ollama Flask Web App</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 2rem;
+      max-width: 800px;
+      margin: auto;
+      background: #f9f9f9;
+      color: #222;
+    }
+    h1, h2 {
+      color: #0a58ca;
+    }
+    code {
+      background: #eee;
+      padding: 2px 4px;
+      border-radius: 4px;
+    }
+    pre {
+      background: #eee;
+      padding: 1rem;
+      overflow-x: auto;
+    }
+    a {
+      color: #0a58ca;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+  <h1>🧠 Ollama Flask Web App</h1>
+  <p>This project demonstrates how to run a local AI chatbot using <strong>Ollama</strong> as your language model, <strong>Flask</strong> for the backend, and a simple HTML/JavaScript frontend. It’s ideal for local development, secure tunneling, and scalable cloud deployment.</p>
+
+  <h2>📦 Features</h2>
+  <ul>
+    <li>Run Ollama locally for privacy-first AI</li>
+    <li>Lightweight Flask backend</li>
+    <li>HTML/JS frontend UI</li>
+    <li>Secure Cloudflare Tunnel for HTTPS access</li>
+    <li>Dockerfile for cloud migration</li>
+  </ul>
+
+  <h2>🚀 Get Started</h2>
+  <pre><code>git clone https://github.com/CptNope/Ollama-Flask-Web-App
+cd Ollama-Flask-Web-App
+python -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+ollama run llama3
+python app.py</code></pre>
+
+  <h2>🌍 Secure Public Access</h2>
+  <p>Use Cloudflare Tunnel:</p>
+  <pre><code>cloudflared tunnel --url http://localhost:5000</code></pre>
+
+  <h2>🐳 Deploy in the Cloud</h2>
+  <pre><code>docker build -t ollama-flask-app .
+docker run -p 5000:5000 ollama-flask-app</code></pre>
+
+  <h2>🔭 Expand It</h2>
+  <ul>
+    <li>Add Stable Diffusion</li>
+    <li>Voice input/output</li>
+    <li>User login & saved chats</li>
+    <li>Multi-model switching</li>
+    <li>Progressive Web App support</li>
+  </ul>
+
+  <p>🔗 <a href="https://github.com/CptNope/Ollama-Flask-Web-App">View the project on GitHub</a></p>
+  <p>Created by <a href="https://jeremyanderson.tech">Jeremy Anderson</a></p>
+</body>
+</html>
