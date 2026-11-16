@@ -20,7 +20,7 @@ A self-hosted, privacy-first language model web app using [Ollama](https://ollam
 
 ```bash
 git clone https://github.com/CptNope/Ollama-Flask-Web-App
-cd ollama-flask-app
+cd Ollama-Flask-Web-App
 python -m venv venv
 source venv/bin/activate  # Windows: venv\Scripts\activate
 pip install -r requirements.txt
@@ -51,11 +51,7 @@ Now open [http://localhost:5000](http://localhost:5000) in your browser.
 To securely access your app without port forwarding:
 
 1. [Install cloudflared](https://developers.cloudflare.com/cloudflare-one/connections/connect-apps/install-and-setup/)
-2. Authenticate:
-```bash
-cloudflared tunnel login
-```
-3. Tunnel your app:
+2. Tunnel your app (a quick tunnel needs no Cloudflare account):
 ```bash
 cloudflared tunnel --url http://localhost:5000
 ```
@@ -65,6 +61,12 @@ You’ll get a public HTTPS link like:
 https://your-tunnel-id.trycloudflare.com
 ```
 
+**Before you share it:**
+
+- Keep Flask debug mode off. The debugger lets anyone who can open the page run Python code on your machine. `app.py` only enables it when you set `FLASK_DEBUG=1`.
+- Anyone with the link can use your model. For more than a quick demo, use a named tunnel on your own domain with [Cloudflare Access](https://developers.cloudflare.com/cloudflare-one/) in front of it.
+- Quick tunnels are for testing: no uptime guarantee, and a new address each time.
+
 ---
 
 ## 🐳 Deploy to the Cloud with Docker
@@ -73,10 +75,14 @@ To deploy this setup on any cloud VM (AWS, DO, Linode, etc.):
 
 ```bash
 docker build -t ollama-flask-app .
-docker run -p 5000:5000 ollama-flask-app
+docker run -p 5000:5000 \
+  --add-host=host.docker.internal:host-gateway \
+  -e HOST=0.0.0.0 \
+  -e OLLAMA_URL=http://host.docker.internal:11434/api/generate \
+  ollama-flask-app
 ```
 
-Ensure Ollama is also installed on the VM, with GPU support if using larger models.
+Inside a container, `localhost` is the container itself, so the app listens on `0.0.0.0` and reaches Ollama on the host at `host.docker.internal`. Ensure Ollama is also installed on the VM, with GPU support if using larger models. For production, run Flask behind a reverse proxy (Caddy or Nginx) with a production server such as Gunicorn.
 
 ---
 

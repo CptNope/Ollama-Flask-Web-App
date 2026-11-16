@@ -1,4 +1,6 @@
-# 🧠 Build Your Own AI-Powered Web App with Ollama + Flask — From Basement to Cloud
+# Build Your Own AI-Powered Web App with Ollama and Flask: From Basement to Cloud
+
+> The full, updated guide is at <https://jeremyanderson.tech/build-your-own-ai-powered-web-app-with-ollama-flask/>.
 
 Welcome to your DIY AI app journey! In this post, we’ll build a local AI chatbot using [Ollama](https://ollama.com), Flask, and basic web tech — and we’ll show you how to securely expose it online using Cloudflare, and later scale it into the cloud.
 
