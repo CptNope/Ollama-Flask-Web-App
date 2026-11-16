@@ -1,138 +1,113 @@
-# 🧠 Ollama Flask Web App
+# Ollama Flask Web App
 
-A self-hosted, privacy-first language model web app using [Ollama](https://ollama.com), Flask, and optional tunneling with Cloudflare. Perfect for local development, labs, or scaling up to cloud deployment.
+A private AI chat app you run yourself. [Ollama](https://ollama.com) runs the language model on your own machine or server, a small Flask app streams its answers, and a plain HTML page gives you a clean chat window. Nothing goes to an outside AI service.
 
----
+Full guide: [Build Your Own AI-Powered Web App with Ollama and Flask](https://jeremyanderson.tech/build-your-own-ai-powered-web-app-with-ollama-flask/)
 
-## 🔧 Project Overview
+## Features
 
-- **Backend**: Flask (Python)
-- **Frontend**: HTML + JavaScript
-- **Model API**: Ollama (running locally)
-- **Tunnel**: Optional Cloudflare Tunnel for HTTPS access without opening ports
-- **Cloud-ready**: Dockerfile included for quick migration
+- **Streaming answers**: text appears as the model writes it, with a Stop button
+- **Real conversations**: the model sees earlier messages in the chat
+- **Model picker**: lists every model you've installed in Ollama
+- **Light and dark themes**, keyboard friendly (Enter sends, Shift+Enter adds a line), works offline
+- **Clear errors** when Ollama isn't running or a model isn't installed
+- **Production-ready Docker image** with Gunicorn, running as a non-root user
+- **Tests** with pytest, run on every pull request
 
----
+## Run it locally
 
-## ⚙️ Getting Started Locally
+1. Install [Ollama](https://ollama.com) and pull a model:
 
-### 1. Clone and Set Up Environment
+   ```bash
+   ollama pull llama3
+   ```
 
-```bash
-git clone https://github.com/CptNope/Ollama-Flask-Web-App
-cd Ollama-Flask-Web-App
-python -m venv venv
-source venv/bin/activate  # Windows: venv\Scripts\activate
-pip install -r requirements.txt
-```
+2. Get the code and install the requirements:
 
-### 2. Start Ollama
+   ```bash
+   git clone https://github.com/CptNope/Ollama-Flask-Web-App
+   cd Ollama-Flask-Web-App
+   python -m venv venv
+   source venv/bin/activate   # Windows: venv\Scripts\activate
+   pip install -r requirements.txt
+   ```
 
-Install [Ollama](https://ollama.com) and run a model:
+3. Start the app and open <http://localhost:5000>:
 
-```bash
-ollama run llama3
-```
+   ```bash
+   python app.py
+   ```
 
-Ensure it's running at: `http://localhost:11434`
+## Settings
 
-### 3. Run Flask App
+All settings are environment variables:
 
-```bash
-python app.py
-```
+| Variable | Default | What it does |
+|---|---|---|
+| `OLLAMA_URL` | `http://localhost:11434` | Where Ollama is running |
+| `OLLAMA_MODEL` | `llama3` | Model selected when the page opens |
+| `SYSTEM_PROMPT` | (none) | Instructions added to every conversation |
+| `HOST` / `PORT` | `127.0.0.1` / `5000` | Address for `python app.py` |
+| `FLASK_DEBUG` | off | Set to `1` for Flask's debugger. **Never on a public address.** |
 
-Now open [http://localhost:5000](http://localhost:5000) in your browser.
+Example: `OLLAMA_MODEL=mistral SYSTEM_PROMPT="Answer briefly." python app.py`
 
----
+## Share it with Cloudflare Tunnel
 
-## 🌐 Public Access with Cloudflare Tunnel
+A quick tunnel gives your local app an HTTPS link without opening ports, and needs no Cloudflare account:
 
-To securely access your app without port forwarding:
-
-1. [Install cloudflared](https://developers.cloudflare.com/cloudflare-one/connections/connect-apps/install-and-setup/)
-2. Tunnel your app (a quick tunnel needs no Cloudflare account):
 ```bash
 cloudflared tunnel --url http://localhost:5000
 ```
 
-You’ll get a public HTTPS link like:
-```
-https://your-tunnel-id.trycloudflare.com
-```
+Before you share the link:
 
-**Before you share it:**
+- **Keep debug mode off.** Flask's debugger lets anyone who can open the page run Python code on your machine.
+- **Anyone with the link can use your model**, and your hardware does the work. For more than a quick demo, use a named tunnel on your own domain with [Cloudflare Access](https://developers.cloudflare.com/cloudflare-one/) in front, so only people you allow can sign in.
+- **Quick tunnels are for testing**: no uptime guarantee, and a new address each time.
 
-- Keep Flask debug mode off. The debugger lets anyone who can open the page run Python code on your machine. `app.py` only enables it when you set `FLASK_DEBUG=1`.
-- Anyone with the link can use your model. For more than a quick demo, use a named tunnel on your own domain with [Cloudflare Access](https://developers.cloudflare.com/cloudflare-one/) in front of it.
-- Quick tunnels are for testing: no uptime guarantee, and a new address each time.
+## Deploy with Docker
 
----
-
-## 🐳 Deploy to the Cloud with Docker
-
-To deploy this setup on any cloud VM (AWS, DO, Linode, etc.):
+Install Ollama on the server (larger models need a GPU) and pull your model, then:
 
 ```bash
 docker build -t ollama-flask-app .
-docker run -p 5000:5000 \
+docker run -d -p 5000:5000 \
   --add-host=host.docker.internal:host-gateway \
-  -e HOST=0.0.0.0 \
-  -e OLLAMA_URL=http://host.docker.internal:11434/api/generate \
+  -e OLLAMA_MODEL=llama3 \
   ollama-flask-app
 ```
 
-Inside a container, `localhost` is the container itself, so the app listens on `0.0.0.0` and reaches Ollama on the host at `host.docker.internal`. Ensure Ollama is also installed on the VM, with GPU support if using larger models. For production, run Flask behind a reverse proxy (Caddy or Nginx) with a production server such as Gunicorn.
+The image runs Gunicorn on port 5000 and reaches Ollama on the host at `host.docker.internal:11434`. Put Caddy or Nginx in front for HTTPS, and add a login (Cloudflare Access, or your proxy's authentication) before it's public.
 
----
+## Tests
 
-## 📈 Scaling Plans
-
-Here are ways to scale and enhance this project:
-
-### 🔄 Multi-Model Switching
-- Add dropdown in frontend to select from available Ollama models
-- Modify `/query` to dynamically load models
-
-### 📂 File or Image Input
-- Expand API to support image uploads (for vision-capable models)
-- Add preview and prompt templating in UI
-
-### 🔊 Speech Capabilities
-- Integrate with Whisper (speech-to-text) and TTS like Piper
-- Enable voice interaction with browser mic
-
-### 🎨 Stable Diffusion
-- Run alongside Ollama using [ComfyUI](https://github.com/comfyanonymous/ComfyUI) or [Automatic1111 WebUI]
-- Add a toggle in UI to switch between text or image generation modes
-
-### 🧱 Plugin System
-- Define pluggable tools (e.g., calculator, document summarizer, PDF reader)
-- Add plugin registry and routing to backend
-
-### 🔐 User Authentication
-- Add login with JWT or session-based authentication
-- Add user history logs, saved prompts, and roles (e.g. viewer, admin)
-
----
-
-## 📁 File Structure
-
-```
-ollama-flask-app/
-├── app.py
-├── requirements.txt
-├── Dockerfile
-├── templates/
-│   └── index.html
-├── static/
-│   └── script.js
-├── README.md
-├── blog.md
+```bash
+pip install -r requirements-dev.txt
+pytest
 ```
 
----
+## Ideas for what's next
 
-## 🙌 Author
+- Retrieval-augmented generation (RAG) over your own documents with a vector database
+- Voice in and out with Whisper and a text-to-speech engine such as Piper
+- Image generation with Stable Diffusion or ComfyUI alongside Ollama
+- User accounts and saved chats
+- Install it as a progressive web app
 
-Created by [Jeremy Anderson](https://jeremyanderson.tech) – AI developer, WordPress engineer, cybersecurity researcher, and game dev. Let’s build cool, ethical tech together!
+## Project layout
+
+```
+app.py              Flask app: page, /api/models, /api/chat (streaming)
+templates/index.html
+static/style.css
+static/script.js
+tests/test_app.py
+Dockerfile
+requirements.txt
+requirements-dev.txt
+```
+
+## Author
+
+Created by [Jeremy Anderson](https://jeremyanderson.tech), MIT licensed.
