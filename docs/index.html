@@ -39,10 +39,11 @@
   <h2>📦 Features</h2>
   <ul>
     <li>Run Ollama locally for privacy-first AI</li>
-    <li>Lightweight Flask backend</li>
-    <li>HTML/JS frontend UI</li>
-    <li>Secure Cloudflare Tunnel for HTTPS access</li>
-    <li>Dockerfile for cloud migration</li>
+    <li>Streaming answers with a Stop button</li>
+    <li>Real conversations and a picker for your installed models</li>
+    <li>Light and dark themes, works offline</li>
+    <li>Cloudflare Tunnel for HTTPS access</li>
+    <li>Production Docker image with Gunicorn</li>
   </ul>
 
   <h2>🚀 Get Started</h2>
@@ -51,7 +52,7 @@ cd Ollama-Flask-Web-App
 python -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
-ollama run llama3
+ollama pull llama3
 python app.py</code></pre>
 
   <h2>🌍 Secure Public Access</h2>
@@ -60,17 +61,21 @@ python app.py</code></pre>
 
   <h2>🐳 Deploy in the Cloud</h2>
   <pre><code>docker build -t ollama-flask-app .
-docker run -p 5000:5000 ollama-flask-app</code></pre>
+docker run -d -p 5000:5000 \
+  --add-host=host.docker.internal:host-gateway \
+  ollama-flask-app</code></pre>
+  <p>Keep Flask's debug mode off and put a login such as Cloudflare Access in front before sharing it.</p>
 
   <h2>🔭 Expand It</h2>
   <ul>
     <li>Add Stable Diffusion</li>
     <li>Voice input/output</li>
-    <li>User login & saved chats</li>
-    <li>Multi-model switching</li>
+    <li>User login &amp; saved chats</li>
+    <li>RAG over your own documents</li>
     <li>Progressive Web App support</li>
   </ul>
 
+  <p>📖 <a href="https://jeremyanderson.tech/build-your-own-ai-powered-web-app-with-ollama-flask/">Read the full guide</a></p>
   <p>🔗 <a href="https://github.com/CptNope/Ollama-Flask-Web-App">View the project on GitHub</a></p>
   <p>Created by <a href="https://jeremyanderson.tech">Jeremy Anderson</a></p>
 </body>

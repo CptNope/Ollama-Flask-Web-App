@@ -1,14 +1,41 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Ollama LLM Chat</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Local AI chat</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-  <h1>Chat with Ollama</h1>
-  <textarea id="prompt" placeholder="Ask something..." rows="4" cols="50"></textarea><br/>
-  <button onclick="sendPrompt()">Send</button>
-  <pre id="response"></pre>
-  <script src="/static/script.js"></script>
+  <header class="bar">
+    <div class="where">
+      <span class="dot" id="dot" aria-hidden="true"></span>
+      <label for="model" class="model-label">Model</label>
+      <select id="model" data-default="{{ default_model }}">
+        <option>{{ default_model }}</option>
+      </select>
+      <span class="host">via Ollama</span>
+    </div>
+    <button type="button" id="clear" class="quiet">New chat</button>
+  </header>
+
+  <main id="log" class="log" aria-label="Conversation">
+    <section class="empty" id="empty">
+      <h1>Ask your own AI anything.</h1>
+      <p>Your messages go only to the Ollama model running on your own machine or server, not to any outside AI service.</p>
+      <p class="notice" id="notice" hidden></p>
+    </section>
+  </main>
+
+  <form id="composer" class="composer">
+    <label for="prompt" class="visually-hidden">Message</label>
+    <textarea id="prompt" rows="1" placeholder="Message the model" autocomplete="off" required></textarea>
+    <button type="submit" id="send">Send</button>
+    <button type="button" id="stop" hidden>Stop</button>
+  </form>
+  <p id="status" class="status" role="status" aria-live="polite"></p>
+  <p class="hint">Enter sends. Shift+Enter adds a new line.</p>
+
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>
